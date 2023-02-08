@@ -1,7 +1,4 @@
-use crate::{
-    components::{MainCamera, Position},
-    player::Player,
-};
+use crate::{components::MainCamera, player::Player};
 use bevy::prelude::*;
 
 const CAMERA_HEIGHT: f32 = 1.0;
@@ -17,10 +14,10 @@ impl Plugin for RenderPlugin {
 }
 
 fn update_camera_pos(
-    player_query: Query<&Position, With<Player>>,
-    mut camera_query: Query<&mut Transform, With<MainCamera>>,
+    player_query: Query<&Transform, (With<Player>, Without<MainCamera>)>,
+    mut camera_query: Query<&mut Transform, (With<MainCamera>, Without<Player>)>,
 ) {
-    let player_pos = player_query
+    let player_transform = player_query
         .get_single()
         .expect("Player should be avaible for renderer");
 
@@ -29,8 +26,9 @@ fn update_camera_pos(
         .expect("Camera should be avaible for renderer");
 
     camera_transform.translation = Vec3 {
-        x: player_pos.x,
+        x: player_transform.translation.x,
         y: CAMERA_HEIGHT,
-        z: player_pos.z,
-    }
+        z: player_transform.translation.z,
+    };
+    camera_transform.rotation = player_transform.rotation;
 }
