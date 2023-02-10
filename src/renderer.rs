@@ -1,4 +1,4 @@
-use crate::{components::MainCamera, player::Player};
+use crate::{components::MainCamera, player::Player, GameState};
 use bevy::prelude::*;
 
 const CAMERA_HEIGHT: f32 = 1.0;
@@ -6,10 +6,7 @@ const CAMERA_HEIGHT: f32 = 1.0;
 pub struct RenderPlugin;
 impl Plugin for RenderPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set_to_stage(
-            CoreStage::PostUpdate,
-            SystemSet::new().with_system(update_camera_pos),
-        );
+        app.add_system_set(SystemSet::on_update(GameState::Ready).with_system(update_camera_pos));
     }
 }
 

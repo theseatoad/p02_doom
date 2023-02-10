@@ -2,6 +2,8 @@
 use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
+
+use crate::GameState;
 #[derive(Component, Default, Debug)]
 pub struct Player;
 
@@ -41,14 +43,14 @@ impl PlayerBundle {
 pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup)
-            .init_resource::<InputState>()
+        app.init_resource::<InputState>()
             .add_system_set_to_stage(
                 CoreStage::Update,
-                SystemSet::new()
+                SystemSet::on_update(GameState::Ready)
                     .with_system(player_movement)
                     .with_system(mouse_look),
-            );
+            )
+            .add_system_set(SystemSet::on_enter(GameState::Ready).with_system(setup));
     }
 }
 
