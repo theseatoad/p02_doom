@@ -2,6 +2,7 @@
 use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
+use bevy::window::CursorGrabMode;
 
 use crate::GameState;
 #[derive(Component, Default, Debug)]
@@ -48,9 +49,14 @@ impl Plugin for PlayerPlugin {
                 CoreStage::Update,
                 SystemSet::on_update(GameState::Ready)
                     .with_system(player_movement)
-                    .with_system(mouse_look),
+                    .with_system(mouse_look)
+                    .with_system(cursor_grab),
             )
-            .add_system_set(SystemSet::on_enter(GameState::Ready).with_system(setup));
+            .add_system_set(
+                SystemSet::on_enter(GameState::Ready)
+                    .with_system(setup)
+                    .with_system(initial_grab_cursor),
+            );
     }
 }
 
@@ -95,17 +101,53 @@ fn mouse_look(
     windows: Res<Windows>,
 ) {
     if let Some(window) = windows.get_primary() {
-        let mut player_transform = player_query
-            .get_single_mut()
-            .expect("Player not spawned in player 'player_look'!");
-        let mut delta_state = state.as_mut();
-        for ev in delta_state.reader_motion.iter(&motion) {
-            let window_scale = window.height().min(window.width());
-            delta_state.y_rot -= (PLAYER_ROTATION_SPEED * ev.delta.x * window_scale).to_radians();
-            // Order is important to prevent unintended roll
-            player_transform.rotation = Quat::from_axis_angle(Vec3::Y, delta_state.y_rot);
+        if window.cursor_grab_mode() != CursorGrabMode::None {
+            let mut player_transform = player_query
+                .get_single_mut()
+                .expect("Player not spawned in player 'player_look'!");
+            let mut delta_state = state.as_mut();
+            for ev in delta_state.reader_motion.iter(&motion) {
+                let window_scale = window.height().min(window.width());
+                delta_state.y_rot -=
+                    (PLAYER_ROTATION_SPEED * ev.delta.x * window_scale).to_radians();
+                // Order is important to prevent unintended roll
+                player_transform.rotation = Quat::from_axis_angle(Vec3::Y, delta_state.y_rot);
+            }
         }
     } else {
         warn!("Primary window not found for `player_look`!");
+    }
+}
+
+fn cursor_grab(keys: Res<Input<KeyCode>>, mut windows: ResMut<Windows>) {
+    if let Some(window) = windows.get_primary_mut() {
+        if keys.just_pressed(KeyCode::Escape) {
+            toggle_grab_cursor(window);
+        }
+    } else {
+        warn!("Primary window not found for `cursor_grab`!");
+    }
+}
+
+/// Grabs/ungrabs mouse cursor
+fn toggle_grab_cursor(window: &mut Window) {
+    match window.cursor_grab_mode() {
+        CursorGrabMode::None => {
+            window.set_cursor_grab_mode(CursorGrabMode::Confined);
+            window.set_cursor_visibility(false);
+        }
+        _ => {
+            window.set_cursor_grab_mode(CursorGrabMode::None);
+            window.set_cursor_visibility(true);
+        }
+    }
+}
+
+/// Grabs the cursor when game first starts
+fn initial_grab_cursor(mut windows: ResMut<Windows>) {
+    if let Some(window) = windows.get_primary_mut() {
+        toggle_grab_cursor(window);
+    } else {
+        warn!("Primary window not found for `initial_grab_cursor`!");
     }
 }

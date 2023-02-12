@@ -1,3 +1,5 @@
+use std::f32::consts::TAU;
+
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::{AssetCollection, LoadingState, LoadingStateAppExt};
 use bevy_sprite3d::Sprite3dPlugin;
@@ -48,7 +50,7 @@ fn main() {
         )
         .add_state(GameState::Loading)
         .add_plugin(Sprite3dPlugin)
-        // .add_plugin(WorldInspectorPlugin)
+        .add_plugin(WorldInspectorPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(RenderPlugin)
         .add_plugin(EnemyPlugin)
@@ -67,16 +69,29 @@ fn setup(
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
     });
-    // light
-    // commands.spawn(PointLightBundle {
-    //     point_light: PointLight {
-    //         intensity: 1500.0,
-    //         shadows_enabled: true,
-    //         ..default()
-    //     },
-    //     transform: Transform::from_xyz(4.0, 8.0, 4.0),
-    //     ..default()
-    // });
+
+    // North wall
+    // cube
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+        transform: Transform {
+            translation: Vec3 {
+                x: 0.,
+                y: 0.,
+                z: 2.,
+            },
+            rotation: Quat::from_rotation_x(1.570796),
+            scale: Vec3::ONE,
+        },
+        ..default()
+    });
+    // South wall
+
+    // East wall
+
+    // West wall
+
     // camera
     commands
         .spawn(Camera3dBundle {
