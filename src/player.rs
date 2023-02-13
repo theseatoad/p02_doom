@@ -8,7 +8,7 @@ use crate::GameState;
 #[derive(Component, Default, Debug)]
 pub struct Player;
 
-const PLAYER_SPEED: f32 = 1.0;
+const PLAYER_SPEED: f32 = 5.0;
 const PLAYER_ROTATION_SPEED: f32 = 0.001;
 
 /// Keeps track of mouse motion events, pitch, and yaw

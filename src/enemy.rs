@@ -1,12 +1,12 @@
 use bevy::prelude::*;
 use bevy_sprite3d::{AtlasSprite3d, AtlasSprite3dComponent, Sprite3dParams};
 
-use crate::{GameState, ImageAssets};
+use crate::{renderer::Billboard, GameState, ImageAssets};
 #[derive(Component, Default, Debug)]
 pub struct Enemy;
 
 #[derive(Component, Deref, DerefMut)]
-struct AnimationTimer(Timer);
+pub struct AnimationTimer(pub Timer);
 
 pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
@@ -32,7 +32,7 @@ fn spawn_enemy(
 
                 index: 3,
 
-                transform: Transform::from_xyz(0., 0.5, 0.),
+                transform: Transform::from_xyz(7.0, 0.5, 7.),
                 pivot: Some(Vec2::new(0.5, 0.5)),
                 ..default()
             }
@@ -41,7 +41,8 @@ fn spawn_enemy(
         .insert(AnimationTimer(Timer::from_seconds(
             0.5,
             TimerMode::Repeating,
-        )));
+        )))
+        .insert(Billboard);
 }
 
 fn animate_sprite(
