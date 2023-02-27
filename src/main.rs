@@ -12,7 +12,9 @@ pub mod environment;
 pub mod player;
 pub mod renderer;
 pub mod resources;
+pub mod ui;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use ui::GunUIPlugin;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 enum GameState {
@@ -30,6 +32,10 @@ struct ImageAssets {
     #[asset(texture_atlas(columns = 4, rows = 1))]
     #[asset(path = "torch_red.png")]
     torch_red: Handle<TextureAtlas>,
+    #[asset(path = "pistol_idle.png")]
+    pistol_idle: Handle<Image>,
+    #[asset(path = "pistol_shoot.png")]
+    pistol_shoot: Handle<Image>,
 }
 
 // Defines the amount of time that should elapse between each physics step.
@@ -59,6 +65,7 @@ fn main() {
         .add_plugin(RenderPlugin)
         .add_plugin(EnemyPlugin)
         .add_plugin(EnvironmentPlugin)
+        .add_plugin(GunUIPlugin)
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .add_system_set(SystemSet::on_enter(GameState::Ready).with_system(setup))
         .run();

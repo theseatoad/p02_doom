@@ -1,10 +1,9 @@
+use crate::GameState;
 /// Inspiration from https://github.com/sburris0/bevy_flycam/
 use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy::window::CursorGrabMode;
-
-use crate::GameState;
 #[derive(Component, Default, Debug)]
 pub struct Player;
 
@@ -17,6 +16,9 @@ struct InputState {
     reader_motion: ManualEventReader<MouseMotion>,
     y_rot: f32,
 }
+
+#[derive(Component)]
+struct Shooting();
 
 #[derive(Bundle)]
 pub struct PlayerBundle {
